@@ -22,17 +22,17 @@ function varargout = table_test(varargin)
 
 % Edit the above text to modify the response to help table_test
 
-% Last Modified by GUIDE v2.5 08-Apr-2015 18:53:33
+% Last Modified by GUIDE v2.5 08-Apr-2015 21:33:53
 
 % Begin initialization code - DO NOT EDIT
 
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @table_test_OpeningFcn, ...
-                   'gui_OutputFcn',  @table_test_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+    'gui_Singleton',  gui_Singleton, ...
+    'gui_OpeningFcn', @table_test_OpeningFcn, ...
+    'gui_OutputFcn',  @table_test_OutputFcn, ...
+    'gui_LayoutFcn',  [] , ...
+    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -57,16 +57,23 @@ function table_test_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 % Update handles structure
-jEditor = javax.swing.JTextField('click me');
-handles.jEditor=jEditor;
-javacomponent(jEditor, [50,50,80,20], handles.figure1);
+%jEditor = javax.swing.JTextField('click me');
+%javacomponent(jEditor, [50,50,80,20], handles.figure1);
+%set(jEditor,'FocusLostCallback',@(hObject, eventdata, handles)focusLost(hObject, eventdata, handles));
+%set(jEditor,'FocusLostCallback',@(src,evnt)focusLost(ths,src,evnt));
+
+%set(jEditor,'FocusLostCallback',{@myMatlabFunc,handles})
+%...
+%    handles.jEditor=jEditor;
+% handles.jCtrl = findjobj(ths.hCtrl);
+% set(ths.jCtrl,'FocusLostCallback',@(src,evnt)focusLost(ths,src,evnt));
 guidata(hObject, handles);
 % UIWAIT makes table_test wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = table_test_OutputFcn(hObject, eventdata, handles) 
+function varargout = table_test_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -74,7 +81,7 @@ function varargout = table_test_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
-handles.uitable1.Data=rand(33,2);
+handles.uitable1.Data=zeros(33,2);
 handles.uitable1.ColumnName='';
 handles.uitable1.RowName='';
 handles.uitable1.Position(3)=handles.uitable1.Extent(3);
@@ -87,22 +94,20 @@ function uitable1_CellSelectionCallback(hObject, eventdata, handles)
 %	Indices: row and column indices of the cell(s) currently selecteds
 % handles    structure with handles and user data (see GUIDATA)
 %disp(eventdata);
-hObject.Units='pixels';
-handles.edit1.Units='pixels';
-dp_position=hObject.Extent(4)/size(handles.uitable1.Data,1)-0.15;
-if(eventdata.Indices(2)==2)
-%     handles.edit1.Position(1)=hObject.position(1)+hObject.ColumnWidth{1};
-%     handles.edit1.Position(2)=hObject.position(2)+hObject.position(4)-eventdata.Indices(1)*dp_position;
-%     handles.edit1.Position(3)=hObject.position(3)-hObject.ColumnWidth{1};
-%     handles.edit1.Position(4)=dp_position;
-%     uicontrol(handles.edit1);
-
+if(size(eventdata.Indices,1)>0 && eventdata.Indices(2)==2)
+    hObject.Units='pixels';
+    handles.edit1.Units='pixels';
+    dp_position=hObject.Extent(4)/size(handles.uitable1.Data,1)-0.15;
     position(1)=hObject.Position(1)+hObject.ColumnWidth{1};
     position(2)=hObject.Position(2)+hObject.Position(4)-eventdata.Indices(1)*dp_position;
     position(3)=hObject.Position(3)-hObject.ColumnWidth{1};
-    position(4)=dp_position;    
-    
-    javacomponent(handles.jEditor, position, handles.figure1);
+    position(4)=dp_position;
+    handles.edit1.Position=position;
+    handles.focus=eventdata.Indices;
+    handles.edit1.Visible='on';
+    uicontrol(handles.edit1);
+    %javacomponent(handles.jEditor, position, handles.figure1);
+    guidata(hObject, handles);
 end
 
 
@@ -115,7 +120,12 @@ function edit1_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit1 as text
 %        str2double(get(hObject,'String')) returns contents of edit1 as a double
-disp('edit1_Callback');
+x=str2double(handles.edit1.String);
+if ~isnan(x)
+    handles.uitable1.Data(handles.focus(1),handles.focus(2))=x;
+    handles.edit1.Visible='off';
+end
+%disp('edit1_Callback');
 
 
 % --- Executes during object creation, after setting all properties.
@@ -152,8 +162,3 @@ function popupmenu1_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-function callback_fcn(hSource, eventData)
-    
-disp('callback_fcn');
