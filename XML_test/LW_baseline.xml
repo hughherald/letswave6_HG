@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<function_config>
+   <user_interface>
+      <string name="hello"/>
+      <input defualt="subtract" id="operation" name="  operation" type="select">
+         <option value="zscore">zscore</option>
+         <option value="erpercent">erpercent</option>
+         <option value="divide">divide</option>
+         <option value="subtract">subtract</option>
+      </input>
+      <input defualt="0" max="header.xend" min="header.xstart" name="xstart" type="number"/>
+      <input defualt="0" max="header.xend" min="header.xstart" name="xend" type="number"/>
+   </user_interface>
+</function_config>
