@@ -8,7 +8,7 @@
          <option value="divide">divide</option>
          <option value="subtract">subtract</option>
       </item>
-      <item default="0" id="xstart" max="header.xend" min="header.xstart" name="xstart" type="number"/>
+      <item default="0" max="header.xend" min="header.xstart" name="xstart" type="number"/>
       <item default="0" id="xend" max="header.xend" min="header.xstart" name="xend" type="number"/>
       <item default="bl" name="prefix" type="string"/>
       <item default="yes" name="save" type="binary"/>

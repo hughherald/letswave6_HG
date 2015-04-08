@@ -1,14 +1,14 @@
 clc;clear;
-docNode = com.mathworks.xml.XMLUtils.createDocument('function_config');
+docNode = com.mathworks.xml.XMLUtils.createDocument('function');
 docRootNode = docNode.getDocumentElement;
 
 form = docNode.createElement('user_interface');
 
-term=docNode.createElement('string');
+term=docNode.createElement('item');
 term.setAttribute('name','hello');
 form.appendChild(term);
 
-term=docNode.createElement('input');
+term=docNode.createElement('item');
 term.setAttribute('name','  operation');
 term.setAttribute('id','operation');
 term.setAttribute('type','select');
@@ -28,24 +28,40 @@ option =docNode.createElement('option');
 option.setAttribute('value','subtract');
 option.appendChild(docNode.createTextNode('subtract'));
 term.appendChild(option);
-term.setAttribute('defualt','subtract');
+term.setAttribute('default','subtract');
 form.appendChild(term);
 
-term=docNode.createElement('input');
+term=docNode.createElement('item');
 term.setAttribute('type','number');
 term.setAttribute('name','xstart');
+term.setAttribute('id','xstart');
 term.setAttribute('min','header.xstart');
 term.setAttribute('max','header.xend');
-term.setAttribute('defualt','0');
+term.setAttribute('default','0');
 form.appendChild(term);
 
 
-term=docNode.createElement('input');
+term=docNode.createElement('item');
 term.setAttribute('type','number');
 term.setAttribute('name','xend');
+term.setAttribute('id','xend');
 term.setAttribute('min','header.xstart');
 term.setAttribute('max','header.xend');
-term.setAttribute('defualt','0');
+term.setAttribute('default','0');
+form.appendChild(term);
+
+
+term=docNode.createElement('item');
+term.setAttribute('type','string');
+term.setAttribute('name','prefix');
+term.setAttribute('default','bl');
+form.appendChild(term);
+
+
+term=docNode.createElement('item');
+term.setAttribute('type','binary');
+term.setAttribute('name','save');
+term.setAttribute('default','yes');
 form.appendChild(term);
 
 docRootNode.appendChild(form);
@@ -83,7 +99,7 @@ xmlwrite('LW_baseline.xml',docNode);
 % term.setAttribute('type','number');
 % term.setAttribute('name','hello');
 % term.setAttribute('arg','1');
-% term.setAttribute('defualt','1');
+% term.setAttribute('default','1');
 % term.setAttribute('min','header.xstart');
 % term.setAttribute('max','header.xend');
 % form.appendChild(term);
@@ -92,7 +108,7 @@ xmlwrite('LW_baseline.xml',docNode);
 % term.setAttribute('type','select');
 % term.setAttribute('name','hello');
 % term.setAttribute('arg','1');
-% term.setAttribute('defualt','1');
+% term.setAttribute('default','1');
 % option =docNode.createElement('option');
 % option.setAttribute('value','option1');
 % option.appendChild(docNode.createTextNode('option1'));

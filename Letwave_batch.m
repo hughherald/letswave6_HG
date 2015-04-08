@@ -22,16 +22,16 @@ function varargout = Letwave_batch(varargin)
 
 % Edit the above text to modify the response to help Letwave_batch
 
-% Last Modified by GUIDE v2.5 08-Apr-2015 22:30:48
+% Last Modified by GUIDE v2.5 09-Apr-2015 01:06:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @Letwave_batch_OpeningFcn, ...
-                   'gui_OutputFcn',  @Letwave_batch_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+    'gui_Singleton',  gui_Singleton, ...
+    'gui_OpeningFcn', @Letwave_batch_OpeningFcn, ...
+    'gui_OutputFcn',  @Letwave_batch_OutputFcn, ...
+    'gui_LayoutFcn',  [] , ...
+    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -55,6 +55,17 @@ function Letwave_batch_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for Letwave_batch
 handles.output = hObject;
 
+rootNode = xmlread('LW_baseline.xml');
+%xmlwrite('LW_baseline.xml',rootNode);
+theNode = rootNode.getElementsByTagName('item');
+handles.tab_fun.Data=cell(theNode.getLength,2);
+for k=1:theNode.getLength
+    item=theNode.item(k-1);
+    handles.tab_fun.Data(k,1)=item.getAttribute('name');
+    handles.tab_fun.Data(k,2)=item.getAttribute('default');
+end
+handles.table_temp.Data=cell(1,1);
+handles.theNode=theNode;
 % Update handles structure
 guidata(hObject, handles);
 
@@ -63,7 +74,7 @@ guidata(hObject, handles);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Letwave_batch_OutputFcn(hObject, eventdata, handles) 
+function varargout = Letwave_batch_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -73,19 +84,19 @@ function varargout = Letwave_batch_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes on selection change in listbox1.
-function listbox1_Callback(hObject, eventdata, handles)
-% hObject    handle to listbox1 (see GCBO)
+% --- Executes on selection change in listbox_fun.
+function listbox_fun_Callback(hObject, eventdata, handles)
+% hObject    handle to listbox_fun (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from listbox1
+% Hints: contents = cellstr(get(hObject,'String')) returns listbox_fun contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from listbox_fun
 
 
 % --- Executes during object creation, after setting all properties.
-function listbox1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to listbox1 (see GCBO)
+function listbox_fun_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to listbox_fun (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -93,4 +104,47 @@ function listbox1_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes when selected cell(s) is changed in tab_fun.
+function tab_fun_CellSelectionCallback(hObject, eventdata, handles)
+% hObject    handle to tab_fun (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
+%	Indices: row and column indices of the cell(s) currently selecteds
+% handles    structure with handles and user data (see GUIDATA)
+table_temp_CellEditCallback(hObject, eventdata, handles)
+if(size(eventdata.Indices,1)>0 && eventdata.Indices(2)==2);
+    item=handles.theNode.item(eventdata.Indices(1)-1);
+    if ~strcmp(item.getAttribute('default'),'')
+        handles.focus=eventdata.Indices;
+        hObject.Units='pixels';
+        handles.table_temp.Units='pixels';
+        dp_position=hObject.Extent(4)/size(handles.tab_fun.Data,1)-0.15;
+        position(1)=hObject.Position(1)+hObject.ColumnWidth{1};
+        position(2)=hObject.Position(2)+hObject.Position(4)-eventdata.Indices(1)*dp_position;
+        position(3)=hObject.Position(3)-hObject.ColumnWidth{1};
+        position(4)=dp_position;
+        handles.table_temp.Position=position;
+        handles.table_temp.Visible='on';
+        uicontrol(handles.table_temp.Parent);
+        guidata(hObject, handles);
+    end
+end
+
+
+% --- Executes when entered data in editable cell(s) in table_temp.
+function table_temp_CellEditCallback(hObject, eventdata, handles)
+% hObject    handle to table_temp (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
+%	Indices: row and column indices of the cell(s) edited
+%	PreviousData: previous data for the cell(s) edited
+%	EditData: string(s) entered by the user
+%	NewData: EditData or its converted form set on the Data property. Empty if Data was not changed
+%	Error: error string when failed to convert EditData to appropriate value for Data
+% handles    structure with handles and user data (see GUIDATA)
+x=str2double(handles.table_temp.Data);
+if ~isnan(x)
+    handles.table_fun.Data(handles.focus(1),handles.focus(2))=x;
+    handles.table_temp.Visible='off';
 end
